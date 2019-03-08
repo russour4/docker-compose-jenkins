@@ -1,0 +1,51 @@
+version: '3'
+services:
+
+  postgres:
+    container_name: postgres
+    image: postgres:9-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+
+    networks:
+      integracao:
+         ipv4_address: 172.18.0.2
+
+  sonarqube:
+    container_name: sonarqube
+    image: sonarqube:latest
+    ports:
+      - "12345:9000"
+      - "50001:50000"
+    networks:
+      integracao:
+         ipv4_address: 172.18.0.3
+
+    depends_on:
+      - postgres
+
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "54321:5432"
+      - "50000:50000"
+      - "8080:8080"
+    networks:
+      integracao:
+         ipv4_address: 172.18.0.4
+    volumes:
+       - /home/hitss/Downloads/docker/docker/apache-maven-3.6.0:/home/JDK_8
+       - /home/hitss/Downloads/docker/docker/jdk1.8.0_201:/home/maven
+
+
+networks:
+ integracao:
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.18.0/5
+
