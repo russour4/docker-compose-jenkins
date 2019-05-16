@@ -1,3 +1,4 @@
+
 version: '3'
 services:
 
@@ -11,7 +12,7 @@ services:
 
     networks:
       integracao:
-         ipv4_address: 172.18.0.2
+         ipv4_address: 172.20.0.4
 
   sonarqube:
     container_name: sonarqube
@@ -21,11 +22,10 @@ services:
       - "50001:50000"
     networks:
       integracao:
-         ipv4_address: 172.18.0.3
+         ipv4_address: 172.20.0.3
 
     depends_on:
       - postgres
-
 
   jenkins:
     image: jenkins/jenkins:lts
@@ -36,16 +36,15 @@ services:
       - "8080:8080"
     networks:
       integracao:
-         ipv4_address: 172.18.0.4
+         ipv4_address: 172.20.0.2
     volumes:
        - /home/hitss/Downloads/docker/docker/apache-maven-3.6.0:/home/JDK_8
        - /home/hitss/Downloads/docker/docker/jdk1.8.0_201:/home/maven
-
 
 networks:
  integracao:
         ipam:
             driver: default
             config:
-                - subnet: 172.18.0/5
+                - subnet: 172.20.0.0/16
 
