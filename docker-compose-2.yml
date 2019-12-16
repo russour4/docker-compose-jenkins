@@ -1,0 +1,54 @@
+version: '3'
+services:
+  jenkins:
+    image: jenkins/jenkins:latest
+    container_name: jenkins
+    user: jenkins
+    networks:
+      - sonarnet
+    volumes:
+      - /data/jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      JENKINS_HOST_HOME: "/data/jenkins"
+    ports:
+      - "8080:8080"
+      - "5000:5000"
+      - "50000:50000"
+
+  artifactory:
+    image: docker.bintray.io/jfrog/artifactory-cpp-ce:latest
+    container_name: artifactory
+    networks:
+      - sonarnet
+    environment:
+      JENKINS_HOST_HOME: "/data/jenkins"
+    ports:
+      - "8081:8081"
+
+  sonarqube:
+    image: sonarqube
+    ports:
+      - "9001:9000"
+    networks:
+      - sonarnet
+    environment:
+      - sonar.jdbc.url=jdbc:postgresql://postgres:5432/sonar
+    depends_on:
+      - postgres
+
+
+  postgres:
+    image: lmmdock/postgres-multi
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USERS=sonar:sonar
+      - POSTGRES_DATABASES=sonar:sonar
+    networks:
+     - sonarnet
+
+
+networks:
+  sonarnet:
+    driver: bridge
